@@ -38,7 +38,8 @@ public:
     // 各種Transform情報
     const Vector3& GetRotate() const { return transform_.rotate; }
     const Vector3& GetTranslate() const { return transform_.translate; }
-
+    Vector3& GetTranslate() { return transform_.translate; }
+    Vector3& GetRotate() { return transform_.rotate; }
     // 各種プロジェクション設定値
     float GetFovY() const { return fovY_; }
     float GetAspectRatio() const { return aspectRatio_; }

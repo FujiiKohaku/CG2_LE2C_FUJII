@@ -116,7 +116,7 @@ void Game::Initialize()
 
     // カメラ
     camera_ = new Camera();
-    camera_->SetTranslate({ 0.0f, 1.0f, -10.0f });
+    camera_->SetTranslate({ 0.0f, 0.0f, -10.0f });
     object3dManager_->SetDefaultCamera(camera_);
     // モデル共通設定
 
@@ -149,7 +149,7 @@ void Game::Initialize()
     player2_.Initialize(object3dManager_);
     player2_.SetModel("axis.obj");
     player2_.SetTranslate({ 3.0f, 0.0f, 0.0f }); // 右に移動
-    // player2_.SetRotate({ 0.0f, std::numbers::pi_v<float>, 0.0f });
+    player2_.SetRotate({ 0.0f, std::numbers::pi_v<float>, 0.0f });
     // 敵
 
     enemy_.Initialize(object3dManager_);
@@ -221,7 +221,13 @@ void Game::Update()
     //  開発用UI
     // ==============================
 
-    // ImGui::ShowDemoWindow();
+       // ==============================
+    // ImGui更新（UI構築）
+    // ==============================
+    ImGui::Begin("Camera Controller");
+    ImGui::SliderFloat3("Translate", &camera_->GetTranslate().x, -50.0f, 50.0f);
+    ImGui::SliderFloat3("Rotate", &camera_->GetRotate().x, -3.14f, 3.14f);
+    ImGui::End();
 
     ImGui::Render(); // ImGuiの内部コマンドを生成（描画直前に呼ぶ）
 
@@ -252,6 +258,8 @@ void Game::Draw()
     object3d_.Draw();
     player2_.Draw();
     enemy_.Draw();
+
+
 
     // ----- ImGui描画（デバッグUI） -----
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon_->GetCommandList());
