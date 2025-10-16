@@ -125,6 +125,7 @@ void Game::Initialize()
     ModelManager::GetInstance()->initialize(dxCommon_);
     ModelManager::GetInstance()->LoadModel("plane.obj");
     ModelManager::GetInstance()->LoadModel("axis.obj");
+    ModelManager::GetInstance()->LoadModel("titleTex.obj");
     // =============================
     // 4. モデルと3Dオブジェクト生成
     // =============================
@@ -141,20 +142,14 @@ void Game::Initialize()
 
     // 3Dオブジェクト生成
 
-    object3d_.Initialize(object3dManager_);
-    object3d_.SetModel("plane.obj");
-
     // プレイヤー
 
     player2_.Initialize(object3dManager_);
-    player2_.SetModel("axis.obj");
+    player2_.SetModel("titleTex.obj");
     player2_.SetTranslate({ 3.0f, 0.0f, 0.0f }); // 右に移動
-    player2_.SetRotate({ 0.0f, std::numbers::pi_v<float>, 0.0f });
+    player2_.SetRotate({ std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f });
     // 敵
 
-    enemy_.Initialize(object3dManager_);
-    enemy_.SetModel("plane.obj");
-    enemy_.SetTranslate({ -2.0f, 0.0f, 0.0f }); // 左に移動
 #pragma endregion
 
     //=================================
@@ -221,7 +216,7 @@ void Game::Update()
     //  開発用UI
     // ==============================
 
-       // ==============================
+    // ==============================
     // ImGui更新（UI構築）
     // ==============================
     ImGui::Begin("Camera Controller");
@@ -237,10 +232,46 @@ void Game::Update()
     // 入力状態の更新
     input_->Update();
 
+    //============================================
+    static float t = 0.0f;
+    static float s = 0.0f;
+    // 時間を進める
+    t += 0.1f;
+    s += 3.5f;
+    // 爆発的拡大＋バウンド減衰
+    float explosion = std::exp(-t * 1.0f) * std::sin(s * 100.0f); // 減衰振動
+    float scale = 1.0f + std::abs(explosion) * 4.0f; // 最大約5倍！
+
+    // 微振動で「ブルッ」と揺れる演出
+    float shake = std::sin(s * 60.0f) * 0.05f;
+    scale += shake;
+
+    // スケール適用
+    player2_.SetScale({ scale, scale, scale });
+
+    // ループ
+    if (t > 6.28f)
+        t = 0.0f;
+    //============================================
+
+     // static float t = 0.0f;
+     // t += 0.5f; // ← 高速で回すのがコツ（0.01じゃ遅すぎ）
+
+     // // 速いsin波で小刻みに揺らす
+     // float shake = std::sin(t * 90.0f) * 0.05f; // 周波数60、振幅0.05
+
+     //float baseScale = 1.0f + std::sin(t) * 0.5f;
+     //  float scale = baseScale + shake;
+
+     // player2_.SetScale({ scale, scale, scale });
+
+     // if (t > 6.28f)
+     //     t = 0.0f;
+
     // 各3Dオブジェクトの更新
-    object3d_.Update();
+
     player2_.Update();
-    enemy_.Update();
+
     camera_->Update();
 }
 
@@ -255,11 +286,8 @@ void Game::Draw()
 
     // ----- 3Dオブジェクト描画 -----
     object3dManager_->PreDraw(); // 3D描画準備
-    object3d_.Draw();
+
     player2_.Draw();
-    enemy_.Draw();
-
-
 
     // ----- ImGui描画（デバッグUI） -----
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon_->GetCommandList());
