@@ -11,7 +11,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     // -------------------------------
     // 1. DirectXリソースリーク検出準備
     // ------------------------------- 
-    D3DResourceLeakChecker leakChecker; // 終了時にリソースリークを自動検出
+    D3DResourceLeakChecker leakChecker; // 終了時にリソースリークを自動検出 
 
     // -------------------------------
     // 2. ゲーム本体の生成と初期化
